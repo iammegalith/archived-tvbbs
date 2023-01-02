@@ -12,8 +12,9 @@ import (
 )
 
 type User struct {
-	Name string
-	Age  int
+	Name     string
+	Age      int
+	Password string
 }
 
 func main() {
@@ -38,17 +39,23 @@ func main() {
 
 	// Check if the user is already in the database
 	var age int
-	err = db.QueryRow("SELECT age FROM users WHERE name=?", name).Scan(&age)
+	var password string
+	err = db.QueryRow("SELECT age, password FROM users WHERE name=?", name).Scan(&age, &password)
 	if err != nil {
-		// If the user is not in the database, ask for their age
+		// If the user is not in the database, ask for their age and password
 		if err == sql.ErrNoRows {
 			fmt.Print("Enter your age: ")
 			ageStr, _ := reader.ReadString('\n')
 			// Convert the age string to an int
 			age, _ = strconv.Atoi(ageStr)
 
+			fmt.Print("Enter your password: ")
+			password, _ := reader.ReadString('\n')
+			// Trim the leading and trailing whitespace from the password
+			password = strings.TrimSpace(password)
+
 			// Add the user to the database
-			_, err = db.Exec("INSERT INTO users (name, age) VALUES (?, ?)", name, age)
+			_, err = db.Exec("INSERT INTO users (name, age, password) VALUES (?, ?, ?)", name, age, password)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -56,6 +63,18 @@ func main() {
 		} else {
 			// If there was an error other than sql.ErrNoRows, print the error
 			fmt.Println(err)
+			return
+		}
+	} else {
+		// If the user is in the database, ask for their password
+		fmt.Print("Enter your password: ")
+		passwordInput, _ := reader.ReadString('\n')
+		// Trim the leading and trailing whitespace from the password
+		passwordInput = strings.TrimSpace(passwordInput)
+
+		// Check if the password is correct
+		if passwordInput != password {
+			fmt.Println("Incorrect password!")
 			return
 		}
 	}
