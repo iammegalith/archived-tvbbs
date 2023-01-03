@@ -15,7 +15,7 @@ import (
 
 type User struct {
 	Name     string
-	Age      int
+	Level      int
 	Password string
 }
 
@@ -66,16 +66,13 @@ func handleClient(conn net.Conn) {
 	name = strings.TrimSpace(name)
 
 	// Check if the user is already in the database
-	var age int
+	var level int
 	var password string
-	err = db.QueryRow("SELECT age, password FROM users WHERE name=?", name).Scan(&age, &password)
+	err = db.QueryRow("SELECT level, password FROM users WHERE name=?", name).Scan(&level, &password)
 	if err != nil {
 		// If the user is not in the database, ask for their age and password
 		if err == sql.ErrNoRows {
-			fmt.Fprint(conn, "Enter your age: ")
-			ageStr, _ := reader.ReadString('\n')
-			// Convert the age string to an int
-			age, _ = strconv.Atoi(ageStr)
+			
 
 			fmt.Fprint(conn, "Enter your password: ")
 			password, _ := reader.ReadString('\n')
@@ -83,7 +80,7 @@ func handleClient(conn net.Conn) {
 			password = strings.TrimSpace(password)
 
 			// Add the user to the database
-			_, err = db.Exec("INSERT INTO users (name, age, password) VALUES (?, ?, ?)", name, age, password)
+			_, err = db.Exec("INSERT INTO users (name, , password) VALUES (?, ?, ?)", name, , password)
 		// Load the main menu from a YAML file
 	menuData, err := ioutil.ReadFile("menu.yaml")
 	if err != nil {
@@ -158,7 +155,7 @@ func handleClient(conn net.Conn) {
 				}
 				fmt.Fprintf(conn, "%d. %s -
 				// Print a personalized greeting
-				fmt.Fprintf(conn, "Hello, %s! You are %d years old.\n", name, age)
+				fmt.Fprintf(conn, "Hello, %s! \n", name)
 			} else {
 				fmt.Fprintf(conn, "Performing action: %s\n", item.Action)
 			}

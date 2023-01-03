@@ -183,8 +183,6 @@ fmt.Println("BBS Telnet server listening on port 23...")
 // Accept incoming connections and handle them in a new goroutine
 for {
 conn, err := ln.Accept()
-
-/* insert code here */
 if err != nil {
 	fmt.Println(err)
 	continue
